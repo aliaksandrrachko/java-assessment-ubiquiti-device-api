@@ -11,4 +11,4 @@ plugins {
 }
 
 rootProject.name = 'java-assessment-ubiquiti-device-api'
-include('app', 'list', 'utilities')
+include('app')
