@@ -18,6 +18,7 @@ Device API for managing network deployments consisting of networking devices (Ga
 7. **Development Tools** - Built with assistance from Amazon Q CLI
 8. **Build** - Run `./gradlew build` to build the application
 9. **Run** - Run `./gradlew bootRun` to start the application (accessible at http://localhost:8080/api)
+10. [**OpenAPI definition**](http://localhost:8080/api/swagger-ui/index.html)
 
 ## Prerequisites
 - Java 8 or higher
