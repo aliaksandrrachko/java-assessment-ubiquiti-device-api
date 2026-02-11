@@ -9,11 +9,14 @@ plugins {
 
 group = 'io.github.aliaksandrrachko.ubiquiti'
 version = '0.0.1-SNAPSHOT'
-description = 'The Ubiquiti Java Assessment - Device API with Spring Boot'
+description = 'The Ubiquiti Java Assessment - Network Deployment Device API with Spring Boot'
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'

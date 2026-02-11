@@ -1,6 +1,6 @@
 spring:
   application:
-    name: device-service
+    name: network-deployment-service
 
 server:
   port: 8080

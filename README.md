@@ -41,7 +41,7 @@ Networking device types:
 - **Switch** - connects devices on a computer network
 - **Access Point** - connects devices on a computer network via Wi-Fi
 
-Typically, these devices are connected to one another and collectively form a network deployment. Every device on a computer network can be identified by MAC address. If device is attached to another device in same network, it is represented via uplink reference.
+Typically, these devices are connected to one another and collectively form a network deployment. Every device on a computer network can be identified by [MAC address](https://en.wikipedia.org/wiki/MAC_address). If device is attached to another device in same network, it is represented via uplink reference.
 
 ## Task
 Define and implement Device API, which should support following features:
