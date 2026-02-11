@@ -3,9 +3,21 @@
 [![Java](https://img.shields.io/badge/Java-21-blue)](https://github.com/aliaksandrrachko/java-assessment-ubiquiti-device-api)
 [![Gradle](https://img.shields.io/badge/Gradle-9.3.1-blue)](https://github.com/aliaksandrrachko/java-assessment-ubiquiti-device-api)
 [![Build Scan](https://img.shields.io/badge/Build%20Scan-enabled-brightgreen)](https://gradle.com)
+[![Spring](https://img.shields.io/badge/Spring-6DB33F?logo=Spring&logoColor=white)](https://spring.io/)
 
 ## Overview
 Device API for managing network deployments consisting of networking devices (Gateways, Switches, and Access Points).
+
+## Implementation Notes
+1. **REST API Service** - Implemented as a Spring Boot REST API
+2. **Simplified Model** - Single model class used across all layers (no separate DTOs, domain models, or persistence models) to minimize complexity
+3. **Layered Architecture** - Using package-by-layer structure with merged RestController and Service layer
+4. **Simple Design** - No complex architectural patterns (hexagonal, clean architecture, etc.)
+5. **In-Memory Storage** - Data stored in memory; not persistent between application restarts
+6. **Testing** - Unit and integration tests included with meaningful coverage
+7. **Development Tools** - Built with assistance from Amazon Q CLI
+8. **Build** - Run `./gradlew build` to build the application
+9. **Run** - Run `./gradlew bootRun` to start the application (accessible at http://localhost:8080/api)
 
 ## Prerequisites
 - Java 8 or higher
