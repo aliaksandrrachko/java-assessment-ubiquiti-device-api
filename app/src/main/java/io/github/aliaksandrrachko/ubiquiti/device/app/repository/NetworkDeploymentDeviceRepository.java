@@ -1,6 +1,7 @@
 package io.github.aliaksandrrachko.ubiquiti.device.app.repository;
 
 import io.github.aliaksandrrachko.ubiquiti.device.app.model.NetworkDevice;
+import io.github.aliaksandrrachko.ubiquiti.device.app.model.NetworkDeviceTopologyEntry;
 import java.util.List;
 import java.util.Optional;
 
@@ -11,4 +12,10 @@ public interface NetworkDeploymentDeviceRepository {
     List<NetworkDevice> findAllSortedByType();
 
     Optional<NetworkDevice> findByMacAddress(String macAddress);
+
+    List<NetworkDeviceTopologyEntry> getTopology();
+
+    Optional<NetworkDeviceTopologyEntry> getTopologyFromDevice(String macAddress);
+
+    void clear();
 }

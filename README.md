@@ -58,7 +58,7 @@ Define and implement Device API, which should support following features:
    - Output: Device entry, which consists of deviceType and macAddress
 
 4. **Retrieving all registered network device topology**
-   - Output: Device topology as tree structure, node should be represented as macAddress
+   - Output: Device topology as [tree structure](https://en.wikipedia.org/wiki/Tree_(data_structure)), node should be represented as macAddress
 
 5. **Retrieving network device topology starting from a specific device**
    - Input: macAddress

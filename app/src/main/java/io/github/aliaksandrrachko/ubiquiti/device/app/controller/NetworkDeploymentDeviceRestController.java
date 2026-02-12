@@ -1,6 +1,7 @@
 package io.github.aliaksandrrachko.ubiquiti.device.app.controller;
 
 import io.github.aliaksandrrachko.ubiquiti.device.app.model.NetworkDevice;
+import io.github.aliaksandrrachko.ubiquiti.device.app.model.NetworkDeviceTopologyEntry;
 import io.github.aliaksandrrachko.ubiquiti.device.app.repository.NetworkDeploymentDeviceRepository;
 import io.github.aliaksandrrachko.ubiquiti.device.app.validation.MacAddress;
 import io.swagger.v3.oas.annotations.Operation;
@@ -9,7 +10,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -20,10 +20,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
-@RequestMapping(value = "/network-deployments/devices", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/network-deployments/devices", produces = MediaType.APPLICATION_JSON_VALUE)
 @Tag(name = "Network Deployment Devices", description = "API for managing network deployment devices")
 @Validated
 @RequiredArgsConstructor
@@ -31,7 +31,7 @@ public class NetworkDeploymentDeviceRestController {
 
     private final NetworkDeploymentDeviceRepository networkDeploymentDeviceRepository;
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Register a device", description = "Register a new device to the network deployment")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Device registered successfully"),
@@ -52,28 +52,28 @@ public class NetworkDeploymentDeviceRestController {
     @Operation(summary = "Get device by MAC address", description = "Retrieve a specific device by its MAC address")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Device found"),
-        @ApiResponse(responseCode = "404", description = "Device not found")
+        @ApiResponse(responseCode = "204", description = "Device not found")
     })
-    public Optional<NetworkDevice> getDeviceByMacAddress(@MacAddressParameter @MacAddress @PathVariable String macAddress) {
-        return networkDeploymentDeviceRepository.findByMacAddress(macAddress);
+    public NetworkDevice getDeviceByMacAddress(@MacAddressParameter @MacAddress @PathVariable String macAddress) {
+        return networkDeploymentDeviceRepository.findByMacAddress(macAddress)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NO_CONTENT));
     }
 
     @GetMapping("/topology")
     @Operation(summary = "Get network topology", description = "Retrieve the complete network device topology as a tree structure")
     @ApiResponse(responseCode = "200", description = "Topology retrieved successfully")
-    @ApiResponse(responseCode = "501", description = "Not implemented yet")
-    public Object getTopology() {
-        throw new HttpServerErrorException(HttpStatus.NOT_IMPLEMENTED, "Topology endpoint not yet implemented");
+    public List<NetworkDeviceTopologyEntry> getTopology() {
+        return networkDeploymentDeviceRepository.getTopology();
     }
 
     @GetMapping("/topology/{macAddress}")
     @Operation(summary = "Get topology from device", description = "Retrieve network topology starting from a specific device")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Topology retrieved successfully"),
-        @ApiResponse(responseCode = "404", description = "Device not found"),
-        @ApiResponse(responseCode = "501", description = "Not implemented yet")
+        @ApiResponse(responseCode = "204", description = "Device not found")
     })
-    public Object getTopologyFromDevice(@MacAddressParameter @MacAddress @PathVariable String macAddress) {
-        throw new HttpServerErrorException(HttpStatus.NOT_IMPLEMENTED, "Topology endpoint not yet implemented");
+    public NetworkDeviceTopologyEntry getTopologyFromDevice(@MacAddressParameter @MacAddress @PathVariable String macAddress) {
+        return networkDeploymentDeviceRepository.getTopologyFromDevice(macAddress)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NO_CONTENT));
     }
 }
