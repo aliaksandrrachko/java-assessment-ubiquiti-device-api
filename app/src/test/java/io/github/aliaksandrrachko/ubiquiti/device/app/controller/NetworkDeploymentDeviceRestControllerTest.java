@@ -177,10 +177,17 @@ class NetworkDeploymentDeviceRestControllerTest {
         // when & then
         getNetworkTopology().expectStatus().isOk()
             .expectBody(new ParameterizedTypeReference<List<NetworkDeviceTopologyEntry>>() {})
-            .consumeWith(exchangeResult -> {
-                List<NetworkDeviceTopologyEntry> topology = exchangeResult.getResponseBody();
-                assertThat(topology).isNotNull().hasSize(2);
-            });
+            .consumeWith(exchangeResult ->
+                assertThat(exchangeResult.getResponseBody()).isNotNull().hasSize(2));
+    }
+
+    @Test
+    void shouldReturnEmptyTopology_WhenNoDevicesRegistered() {
+        // when & then
+        getNetworkTopology().expectStatus().isOk()
+            .expectBody(new ParameterizedTypeReference<List<NetworkDeviceTopologyEntry>>() {})
+            .consumeWith(exchangeResult ->
+                assertThat(exchangeResult.getResponseBody()).isNotNull().isEmpty());
     }
 
     @Test
