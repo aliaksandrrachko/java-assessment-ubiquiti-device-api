@@ -1,6 +1,8 @@
 package io.github.aliaksandrrachko.ubiquiti.device.app.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.InstanceOfAssertFactories.list;
+import static org.assertj.core.api.InstanceOfAssertFactories.type;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 import io.github.aliaksandrrachko.ubiquiti.device.app.model.NetworkDevice;
@@ -144,25 +146,23 @@ class NetworkDeploymentDeviceRestControllerTest {
         // when & then
         getNetworkTopology().expectStatus().isOk()
             .expectBody(new ParameterizedTypeReference<List<NetworkDeviceTopologyEntry>>() {})
-            .consumeWith(exchangeResult -> {
-                List<NetworkDeviceTopologyEntry> topology = exchangeResult.getResponseBody();
-                assertThat(topology).isNotNull().hasSize(1);
-                
-                NetworkDeviceTopologyEntry root = topology.get(0);
-                assertThat(root.getMacAddress()).isEqualTo("AA:BB:CC:DD:EE:31");
-                assertThat(root.getType()).isEqualTo(DeviceType.GATEWAY);
-                assertThat(root.getLinkedDevices()).hasSize(1);
-                
-                NetworkDeviceTopologyEntry child = root.getLinkedDevices().get(0);
-                assertThat(child.getMacAddress()).isEqualTo("AA:BB:CC:DD:EE:32");
-                assertThat(child.getType()).isEqualTo(DeviceType.SWITCH);
-                assertThat(child.getLinkedDevices()).hasSize(1);
-                
-                NetworkDeviceTopologyEntry grandChild = child.getLinkedDevices().get(0);
-                assertThat(grandChild.getMacAddress()).isEqualTo("AA:BB:CC:DD:EE:33");
-                assertThat(grandChild.getType()).isEqualTo(DeviceType.ACCESS_POINT);
-                assertThat(grandChild.getLinkedDevices()).isNull();
-            });
+            .consumeWith(exchangeResult ->
+                assertThat(exchangeResult.getResponseBody()).isNotNull()
+                    .singleElement(type(NetworkDeviceTopologyEntry.class))
+                    .returns("AA:BB:CC:DD:EE:31", NetworkDeviceTopologyEntry::getMacAddress)
+                    .returns(DeviceType.GATEWAY, NetworkDeviceTopologyEntry::getType)
+
+                    .extracting(NetworkDeviceTopologyEntry::getLinkedDevices, list(NetworkDeviceTopologyEntry.class))
+                    .singleElement(type(NetworkDeviceTopologyEntry.class))
+                    .returns("AA:BB:CC:DD:EE:32", NetworkDeviceTopologyEntry::getMacAddress)
+                    .returns(DeviceType.SWITCH, NetworkDeviceTopologyEntry::getType)
+
+                    .extracting(NetworkDeviceTopologyEntry::getLinkedDevices, list(NetworkDeviceTopologyEntry.class))
+                    .singleElement(type(NetworkDeviceTopologyEntry.class))
+                    .returns("AA:BB:CC:DD:EE:33", NetworkDeviceTopologyEntry::getMacAddress)
+                    .returns(DeviceType.ACCESS_POINT, NetworkDeviceTopologyEntry::getType)
+                    .returns(null, NetworkDeviceTopologyEntry::getLinkedDevices)
+            );
     }
 
     @Test
@@ -203,14 +203,15 @@ class NetworkDeploymentDeviceRestControllerTest {
 
         // when & then
         getNetworkTopology("AA:BB:CC:DD:EE:52").expectStatus().isOk().expectBody(NetworkDeviceTopologyEntry.class)
-            .consumeWith(exchangeResult -> {
-                NetworkDeviceTopologyEntry root = exchangeResult.getResponseBody();
-                assertThat(root).isNotNull();
-                assertThat(root.getMacAddress()).isEqualTo("AA:BB:CC:DD:EE:52");
-                assertThat(root.getType()).isEqualTo(DeviceType.SWITCH);
-                assertThat(root.getLinkedDevices()).hasSize(1);
-                assertThat(root.getLinkedDevices().get(0).getMacAddress()).isEqualTo("AA:BB:CC:DD:EE:53");
-            });
+            .consumeWith(exchangeResult ->
+                assertThat(exchangeResult.getResponseBody()).isNotNull()
+                    .returns("AA:BB:CC:DD:EE:52", NetworkDeviceTopologyEntry::getMacAddress)
+                    .returns(DeviceType.SWITCH, NetworkDeviceTopologyEntry::getType)
+
+                    .extracting(NetworkDeviceTopologyEntry::getLinkedDevices, list(NetworkDeviceTopologyEntry.class))
+                    .singleElement(type(NetworkDeviceTopologyEntry.class))
+                    .returns("AA:BB:CC:DD:EE:53", NetworkDeviceTopologyEntry::getMacAddress)
+            );
     }
 
     @Test
