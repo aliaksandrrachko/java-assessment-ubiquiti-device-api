@@ -136,12 +136,18 @@ class NetworkDeploymentDeviceRestControllerTest {
     void shouldGetTopology() {
         // given
         NetworkDevice gateway = new NetworkDevice("AA:BB:CC:DD:EE:31", DeviceType.GATEWAY, null);
-        NetworkDevice switchDevice = new NetworkDevice("AA:BB:CC:DD:EE:32", DeviceType.SWITCH, "AA:BB:CC:DD:EE:31");
-        NetworkDevice accessPoint = new NetworkDevice("AA:BB:CC:DD:EE:33", DeviceType.ACCESS_POINT, "AA:BB:CC:DD:EE:32");
+        NetworkDevice switch1 = new NetworkDevice("AA:BB:CC:DD:EE:32", DeviceType.SWITCH, "AA:BB:CC:DD:EE:31");
+        NetworkDevice switch2 = new NetworkDevice("AA:BB:CC:DD:EE:34", DeviceType.SWITCH, "AA:BB:CC:DD:EE:31");
+        NetworkDevice accessPoint1 = new NetworkDevice("AA:BB:CC:DD:EE:33", DeviceType.ACCESS_POINT, "AA:BB:CC:DD:EE:32");
+        NetworkDevice accessPoint2 = new NetworkDevice("AA:BB:CC:DD:EE:35", DeviceType.ACCESS_POINT, "AA:BB:CC:DD:EE:32");
+        NetworkDevice accessPoint3 = new NetworkDevice("AA:BB:CC:DD:EE:36", DeviceType.ACCESS_POINT, "AA:BB:CC:DD:EE:34");
 
         registerDevice(gateway).expectStatus().isOk();
-        registerDevice(switchDevice).expectStatus().isOk();
-        registerDevice(accessPoint).expectStatus().isOk();
+        registerDevice(switch1).expectStatus().isOk();
+        registerDevice(switch2).expectStatus().isOk();
+        registerDevice(accessPoint1).expectStatus().isOk();
+        registerDevice(accessPoint2).expectStatus().isOk();
+        registerDevice(accessPoint3).expectStatus().isOk();
 
         // when & then
         getNetworkTopology().expectStatus().isOk()
@@ -151,17 +157,27 @@ class NetworkDeploymentDeviceRestControllerTest {
                     .singleElement(type(NetworkDeviceTopologyEntry.class))
                     .returns("AA:BB:CC:DD:EE:31", NetworkDeviceTopologyEntry::getMacAddress)
                     .returns(DeviceType.GATEWAY, NetworkDeviceTopologyEntry::getType)
-
                     .extracting(NetworkDeviceTopologyEntry::getLinkedDevices, list(NetworkDeviceTopologyEntry.class))
-                    .singleElement(type(NetworkDeviceTopologyEntry.class))
-                    .returns("AA:BB:CC:DD:EE:32", NetworkDeviceTopologyEntry::getMacAddress)
-                    .returns(DeviceType.SWITCH, NetworkDeviceTopologyEntry::getType)
-
-                    .extracting(NetworkDeviceTopologyEntry::getLinkedDevices, list(NetworkDeviceTopologyEntry.class))
-                    .singleElement(type(NetworkDeviceTopologyEntry.class))
-                    .returns("AA:BB:CC:DD:EE:33", NetworkDeviceTopologyEntry::getMacAddress)
-                    .returns(DeviceType.ACCESS_POINT, NetworkDeviceTopologyEntry::getType)
-                    .returns(null, NetworkDeviceTopologyEntry::getLinkedDevices)
+                    .hasSize(2)
+                    .satisfies(switches -> {
+                        assertThat(switches)
+                            .satisfiesOnlyOnce(sw -> assertThat(sw)
+                                .returns("AA:BB:CC:DD:EE:32", NetworkDeviceTopologyEntry::getMacAddress)
+                                .returns(DeviceType.SWITCH, NetworkDeviceTopologyEntry::getType)
+                                .extracting(NetworkDeviceTopologyEntry::getLinkedDevices, list(NetworkDeviceTopologyEntry.class))
+                                .hasSize(2)
+                                .extracting(NetworkDeviceTopologyEntry::getMacAddress)
+                                .containsExactlyInAnyOrder("AA:BB:CC:DD:EE:33", "AA:BB:CC:DD:EE:35")
+                            )
+                            .satisfiesOnlyOnce(sw -> assertThat(sw)
+                                .returns("AA:BB:CC:DD:EE:34", NetworkDeviceTopologyEntry::getMacAddress)
+                                .returns(DeviceType.SWITCH, NetworkDeviceTopologyEntry::getType)
+                                .extracting(NetworkDeviceTopologyEntry::getLinkedDevices, list(NetworkDeviceTopologyEntry.class))
+                                .singleElement(type(NetworkDeviceTopologyEntry.class))
+                                .returns("AA:BB:CC:DD:EE:36", NetworkDeviceTopologyEntry::getMacAddress)
+                                .returns(DeviceType.ACCESS_POINT, NetworkDeviceTopologyEntry::getType)
+                            );
+                    })
             );
     }
 
